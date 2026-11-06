@@ -39,3 +39,4 @@ tap_text "Moja lista"; sleep 4; shot 08_moja_lista
 adb logcat -d > $OUT/logcat.txt
 grep -iE "AndroidRuntime|FATAL|YouTube|chromium.*error|onError|152|153" $OUT/logcat.txt | head -80 > $OUT/bledy.txt
 ls -la $OUT
+# Fri Nov  6 19:26:06 +04 2026
