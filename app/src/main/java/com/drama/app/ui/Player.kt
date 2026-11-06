@@ -132,11 +132,9 @@ fun PlayerScreen(seriesId: String, startVideo: String?, onBack: () -> Unit) {
                     this@apply.post {
                         errorHolder.value = (
                             when (error) {
-                                PlayerConstants.PlayerError.VIDEO_NOT_PLAYABLE_IN_EMBEDDED_PLAYER,
-                                PlayerConstants.PlayerError.REQUEST_MISSING_HTTP_REFERER ->
-                                    "Studio pozwala oglądać ten film tylko w aplikacji YouTube."
                                 PlayerConstants.PlayerError.VIDEO_NOT_FOUND -> "Ten film został usunięty z YouTube albo jest niedostępny w Twoim kraju."
-                                else -> "Nie udało się odtworzyć filmu. Sprawdź internet albo otwórz go w YouTube."
+                                else -> "YouTube nie odtworzył tego filmu w aplikacji. Otwórz go w YouTube, a postęp i tak się zapisze."
+                            }
                             }
                         )
                     }
