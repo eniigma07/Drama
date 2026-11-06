@@ -42,4 +42,4 @@ tap_text "Moja lista"; sleep 4; shot 08_moja_lista
 adb logcat -d > $OUT/logcat.txt
 grep -E "com.drama.app|chromium" $OUT/logcat.txt | grep -iE "AndroidRuntime|FATAL|CONSOLE|onError|exception" | head -80 > $OUT/bledy.txt
 ls -la $OUT
-# 1793990335
+# 1793990581
