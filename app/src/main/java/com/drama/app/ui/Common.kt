@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,7 +71,7 @@ fun AppTheme(content: @Composable () -> Unit) {
             bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 19.sp),
             labelMedium = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 12.sp),
         ),
-        content = content,
+        content = { CompositionLocalProvider(LocalContentColor provides C.Text, content = content) },
     )
 }
 

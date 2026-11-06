@@ -52,6 +52,8 @@ def thumb(e):
 
 FULL_WORDS = re.compile(r"\b(full|complete|all episodes|full movie|full episodes?|full series|ep\.?\s*1\s*[-~–]|episodes?\s*1\s*[-~–]|1\s*[-–]\s*\d{2,3})\b", re.I)
 TRAILER_WORDS = re.compile(r"\b(trailer|teaser|preview|clip|recap|highlights?|#shorts?)\b", re.I)
+# playlisty zbiorcze kanału (nie jedna seria)
+AGGREGATE = re.compile(r"\b(shorts?|vip|exclusive|watch in one go|new release|hot|trending|popular|top|best|recommend\w*|collection|all (dramas|movies|series)|full movies|playlist|uploads|most viewed)\b", re.I)
 PART = re.compile(r"\b(?:part|pt\.?)\s*(\d+)\b|\((\d+)\s*/\s*\d+\)|\b(\d+)\s*/\s*\d+\b", re.I)
 JUNK = re.compile(
     r"(\[[^\]]*\]|\([^)]*(full|ep|episode|part|movie|dub|eng|sub)[^)]*\)|【[^】]*】|#\S+|\|.*$|"
@@ -146,13 +148,16 @@ def build():
         in_playlists = set()
         # playlisty z odcinkami = seria
         for p in playlists:
-            if TRAILER_WORDS.search(p["title"]) or re.search(r"\bshorts?\b", p["title"], re.I):
+            if TRAILER_WORDS.search(p["title"]) or AGGREGATE.search(p["title"]):
                 continue
             eps = playlist_entries(p["id"])
             eps = [e for e in eps if e["duration"] == 0 or e["duration"] >= 40]
             if len(eps) < 3:
                 continue
             total = sum(e["duration"] for e in eps)
+            if len(eps) > 150 or total > 6 * 3600:
+                log(f"        [zbiorcza playlista, pomijam] {p['title']} ({len(eps)} wideo)")
+                continue
             key = f"{studio}:{key_of(p['title'])}"
             kind = "episodes" if total >= 20 * 60 else "partial"
             for i, e in enumerate(eps):

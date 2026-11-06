@@ -33,7 +33,7 @@ object Store {
         p.edit().putString("favs", favs.joinToString("\n")).apply()
         version++
     }
-    fun favorites(): List<Series> = favs.reversed().mapNotNull { Catalog.byId(it) }
+    fun favorites(): List<Series> = favs.toList().asReversed().mapNotNull { Catalog.byId(it) }
 
     fun position(videoId: String) = pos[videoId] ?: 0f
     fun length(videoId: String) = len[videoId] ?: 0f
