@@ -52,6 +52,8 @@ def thumb(e):
 
 FULL_WORDS = re.compile(r"\b(full|complete|all episodes|full movie|full episodes?|full series|ep\.?\s*1\s*[-~–]|episodes?\s*1\s*[-~–]|1\s*[-–]\s*\d{2,3})\b", re.I)
 TRAILER_WORDS = re.compile(r"\b(trailer|teaser|preview|clip|recap|highlights?|#shorts?)\b", re.I)
+# filmy tylko dla członków kanału (nie da się ich obejrzeć za darmo)
+MEMBERS = re.compile(r"(s?vip[\s_-]*only|members?[\s_-]*only|membership|exclusive for members)", re.I)
 # playlisty zbiorcze kanału (nie jedna seria)
 AGGREGATE = re.compile(r"\b(shorts?|vip|exclusive|watch in one go|new release|hot|trending|popular|top|best|recommend\w*|collection|all (dramas|movies|series)|full movies|playlist|uploads|most viewed)\b", re.I)
 PART = re.compile(r"\b(?:part|pt\.?)\s*(\d+)\b|\((\d+)\s*/\s*\d+\)|\b(\d+)\s*/\s*\d+\b", re.I)
@@ -79,6 +81,10 @@ def part_no(t):
     return int(next(g for g in m.groups() if g))
 
 
+def free(e):
+    return not MEMBERS.search(e.get("title") or "") and (e.get("availability") in (None, "public", "unlisted"))
+
+
 def channel(ch):
     base = f"https://www.youtube.com/{ch['handle']}"
     info = listing(base + "/videos", MAX_VIDEOS)
@@ -94,7 +100,7 @@ def channel(ch):
     }
     videos = []
     for e in info.get("entries") or []:
-        if not e or not e.get("id"):
+        if not e or not e.get("id") or not free(e):
             continue
         videos.append({"id": e["id"], "title": e.get("title") or "", "duration": int(e.get("duration") or 0),
                        "views": e.get("view_count") or 0, "thumb": thumb(e)})
@@ -113,7 +119,7 @@ def playlist_entries(pid):
     info = listing(f"https://www.youtube.com/playlist?list={pid}", 400)
     out = []
     for e in info.get("entries") or []:
-        if e and e.get("id") and (e.get("title") or "") not in ("[Private video]", "[Deleted video]"):
+        if e and e.get("id") and free(e) and (e.get("title") or "") not in ("[Private video]", "[Deleted video]"):
             out.append({"id": e["id"], "title": e.get("title") or "", "duration": int(e.get("duration") or 0),
                         "views": e.get("view_count") or 0, "thumb": thumb(e)})
     return out
