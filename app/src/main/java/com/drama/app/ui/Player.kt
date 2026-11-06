@@ -130,13 +130,10 @@ fun PlayerScreen(seriesId: String, startVideo: String?, onBack: () -> Unit) {
                 }
                 override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
                     this@apply.post {
-                        errorHolder.value = (
-                            when (error) {
-                                PlayerConstants.PlayerError.VIDEO_NOT_FOUND -> "Ten film został usunięty z YouTube albo jest niedostępny w Twoim kraju."
-                                else -> "YouTube nie odtworzył tego filmu w aplikacji. Otwórz go w YouTube, a postęp i tak się zapisze."
-                            }
-                            }
-                        )
+                        errorHolder.value = when (error) {
+                            PlayerConstants.PlayerError.VIDEO_NOT_FOUND -> "Ten film został usunięty z YouTube albo jest niedostępny w Twoim kraju."
+                            else -> "YouTube nie odtworzył tego filmu w aplikacji. Możesz go obejrzeć w aplikacji YouTube."
+                        }
                     }
                 }
             })
