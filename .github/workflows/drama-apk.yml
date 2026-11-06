@@ -1,0 +1,60 @@
+name: Drama - APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - tools/catalog/**
+      - .github/workflows/drama-catalog.yml
+      - README.md
+
+permissions:
+  contents: write
+
+concurrency:
+  group: drama-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Katalog wbudowany w aplikację (najnowszy)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p app/src/main/assets
+          gh release download drama-catalog -p catalog.json -D app/src/main/assets --clobber \
+            || echo '{"version":1,"generated":0,"studios":[],"series":[]}' > app/src/main/assets/catalog.json
+          ls -la app/src/main/assets
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Budowanie
+        shell: bash
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew assembleRelease --stacktrace 2>&1 | tee build.log
+
+      - name: Pokaż błędy kompilacji
+        if: failure()
+        run: grep -E "^e: |error:|What went wrong" build.log | head -80
+
+      - name: Wydanie (stały link)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk Drama.apk
+          gh release view apk >/dev/null 2>&1 || \
+            gh release create apk --title "Drama - aplikacja" --notes "Najnowsza wersja aplikacji Drama."
+          gh release upload apk Drama.apk --clobber
+          gh release edit apk --notes "Najnowsza wersja: build ${{ github.run_number }} ($(date -u +%Y-%m-%d))."
