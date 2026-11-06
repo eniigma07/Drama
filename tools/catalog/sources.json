@@ -26,10 +26,6 @@
    "studio": "ShortMax"
   },
   {
-   "handle": "@FlexTVApp",
-   "studio": "FlexTV"
-  },
-  {
    "handle": "@DramaWaveApp",
    "studio": "DramaWave"
   },
@@ -52,6 +48,10 @@
   {
    "handle": "@DreameShort",
    "studio": "DreameShort"
+  },
+  {
+   "handle": "@FlexTV_English",
+   "studio": "FlexTV"
   }
  ]
 }
