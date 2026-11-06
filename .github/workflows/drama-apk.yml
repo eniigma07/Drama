@@ -47,7 +47,8 @@ jobs:
 
       - name: Pokaż błędy kompilacji
         if: failure()
-        run: grep -E "^e: |error:|What went wrong" build.log | head -80
+        run: |
+          grep -E "^e: |error:|What went wrong" build.log | head -80
 
       - name: Wydanie (stały link)
         env:
